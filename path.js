@@ -1,5 +1,8 @@
 var Path = {
     'version': "0.8",
+    'options': {
+        'strip_querystring': false,
+    },
     'map': function (path) {
         if (Path.routes.defined.hasOwnProperty(path)) {
             return Path.routes.defined[path];
@@ -47,11 +50,23 @@ var Path = {
             }
         }
     },
+    'stripQuerystring': function(path) {
+        var idx = path.indexOf('?');
+        if (idx >= 0) {
+            path = path.substring(0, idx);
+        }
+        return path;
+    },
     'match': function (path, parameterize) {
         var params = {}, route = null, possible_routes, slice, i, j, compare;
         for (route in Path.routes.defined) {
             if (route !== null && route !== undefined) {
                 route = Path.routes.defined[route];
+
+                if ( route.strip_querystring != undefined ? route.strip_querystring : Path.options.strip_querystring ) {
+                    path = Path.stripQuerystring(path);
+                }
+
                 possible_routes = route.partition();
                 for (j = 0; j < possible_routes.length; j++) {
                     slice = possible_routes[j];
